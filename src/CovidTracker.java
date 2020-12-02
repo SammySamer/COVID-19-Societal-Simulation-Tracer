@@ -385,8 +385,8 @@ public class CovidTracker extends JPanel{
 						else
 							COVIDStatus = "Infected";
 						int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
-						String tobeSent = Integer.toString(timestamp) + "," + Integer.toString(posY) + "," + Integer.toString(posX)
-						+ "," + COVIDStatus;
+						String tobeSent = Integer.toString(timestamp) + ", " + Integer.toString(posY) + ", " + Integer.toString(posX)
+						+ ", " + COVIDStatus;
 						out.writeUTF(tobeSent);
 					}
 					

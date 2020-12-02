@@ -4,7 +4,7 @@ import java.io.*;
 public class CovidServer {
     
     private ServerSocket serverS;
-    private Socket sSocket;
+    private Socket cSocket;
     private DataInputStream in;
 
     private int serverPort = 8080;
@@ -15,12 +15,14 @@ public class CovidServer {
             serverS = new ServerSocket(serverPort);
             System.out.println("Server started, now waiting for client..."); 
 
-            sSocket = serverS.accept();
+            cSocket = serverS.accept();
             System.out.println("Client connected!"); 
 
-            in = new DataInputStream(new BufferedInputStream(sSocket.getInputStream()));
+            in = new DataInputStream(new BufferedInputStream(cSocket.getInputStream()));
 
-            String clientInput = "";
+            String clientInput = "";                            //timestamp, x, y, status
+            InetAddress clientAddr = cSocket.getInetAddress();  //ID of User
+            //final string: clientAddr + ", " + clientInput
 
             //once it gets the string "Close.", it'll start closing the server, otherwise keep running
             while (!clientInput.equals("Close.")) {
@@ -28,6 +30,7 @@ public class CovidServer {
                 try { 
                     clientInput = in.readUTF(); 
                     
+                    //NOBNA
                     //need to output to file here instead of print
                     System.out.println(clientInput); 
                 } 
@@ -37,7 +40,7 @@ public class CovidServer {
                 } 
 
                 //close all connections 
-                sSocket.close(); 
+                cSocket.close(); 
                 serverS.close(); 
                 in.close(); 
 
