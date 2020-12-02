@@ -76,7 +76,15 @@ public class CovidTracker extends JPanel{
 			threadsInfectionTimes[i] = (float)infectionTime;
 
 		try {
-			localhostINet = InetAddress.getLocalHost();
+			localhostINet = InetAddress.getByName("127.0.0.1");
+		}
+
+		catch (UnknownHostException u) {
+			System.out.println(u);
+		}
+
+		try {
+			clientUDP = new DatagramSocket();
 		}
 
 		catch (IOException i) {
@@ -261,7 +269,8 @@ public class CovidTracker extends JPanel{
 				}
 				
 				PrintInfected();
-	       } 
+			} 
+			
 	        catch (InterruptedException e) 
 	        { 
 	            // Throwing an exception 
@@ -271,7 +280,7 @@ public class CovidTracker extends JPanel{
 	        catch (Exception e) 
 	        { 
 	            // Throwing an exception 
-	            System.out.println ("Exception is caught"); 
+	            System.out.println (e); 
 	        } 
 	    } 
 	}
@@ -377,7 +386,7 @@ public class CovidTracker extends JPanel{
 					//what's being sent: "timestamp, x, y, COVID_status"
 					try {
 						buffer = null;
-						String COVIDStatus = "";
+						String COVIDStatus = null;
 
 						if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 0)	
 							COVIDStatus = "False";
@@ -388,7 +397,7 @@ public class CovidTracker extends JPanel{
 
 						int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
 						String tobeSent = Integer.toString(timestamp) + ", " + Integer.toString(posY) + ", " + Integer.toString(posX)
-						+ ", " + COVIDStatus;
+						+ ", " + COVIDStatus + "\n";
 
 						buffer = tobeSent.getBytes();
 						DatagramPacket toSend = new DatagramPacket(buffer, buffer.length, localhostINet, serverPort);

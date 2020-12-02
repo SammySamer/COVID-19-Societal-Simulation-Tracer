@@ -5,7 +5,6 @@ public class CovidServer {
     
     //private ServerSocket serverS;
     //private Socket cSocket;
-    private DataInputStream in;
 
     //UDP
     DatagramSocket clientUDP;
@@ -15,6 +14,8 @@ public class CovidServer {
     private int serverPort = 8080;
     String fileName = "tracer.log";
     String str = "";
+
+    boolean outputClosed = false;
     
 	static BufferedWriter out;
 
@@ -30,44 +31,57 @@ public class CovidServer {
 
         try {
             clientUDP = new DatagramSocket(serverPort);
+            clientUDP.setSoTimeout(15000);
             serverRec = new DatagramPacket(recBuffer, recBuffer.length);
             System.out.println("Server started, now waiting for client...");
-
+            
+            printTitle(fileName);
             clientUDP.receive(serverRec);
             System.out.println("Client online: they sent their first datagram!");
 
-            printTitle(fileName);
-
-            InetAddress clientAddr = serverRec.getAddress();    // ID of User
-
-
-            // once it gets the string "Close.", it'll start closing the server and server's socket, 
-            // otherwise keep running
-            while (!data(recBuffer).toString().equals("Close.")) {
+            while (true) {
 
                 try {
+                    try {
+                        clientUDP.receive(serverRec);
+                    }
+
+                    catch (SocketTimeoutException s) {   
+                        System.out.println("Client timed out after 15 seconds of idle time.");
+                        out.close();
+                        clientUDP.close();
+                        System.exit(1);
+                    }
+
+                    //if output is to be closed
+                    if (data(recBuffer).toString().equals("Close.")) {
+                        System.out.println("Client sent their last datagram! Commencing server shutdown.");
+                        out.close();
+                        clientUDP.close();
+                        System.exit(1);
+                    }
+                    
+                    //if output is open and we received to close
+                    else if (data(recBuffer).toString().equals("Close.") && outputClosed == false) {
+                        out.close();
+                        outputClosed = true;
+                        System.out.println("Client finished simulation!");
+                    }
+        
+                    InetAddress clientAddr = serverRec.getAddress();    // ID of User
                     String clientInput = ""; // timestamp, x, y, status
                     clientInput = data(recBuffer).toString();
                     str = clientAddr.toString();
 
                     // need to output to file here instead of print
                     str = str + ", " + clientInput;
-                    appendStrToFile(fileName, str);
-                    
-                    clientUDP.receive(serverRec);
+                    appendStrToFile(fileName, str);                   
                 }
 
                 catch (IOException i) {
                     System.out.println(i);
                 }
             }
-            
-            // close all connections
-            //cSocket.close();
-            //serverS.close();
-            in.close();
-            out.close();
-
         }
 
         catch (IOException i) {
