@@ -374,7 +374,7 @@ public class CovidTracker extends JPanel{
 
 
 					//TCP - new coords to be sent
-					//what's being sent: "timestamp,x,y,COVID_status"
+					//what's being sent: "timestamp, x, y, COVID_status"
 					try {
 						String COVIDStatus = "";
 						if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 0)	
