@@ -12,6 +12,9 @@ import javax.swing.border.BevelBorder;
 
 import java.util.concurrent.*;
 
+import java.io.*;
+import java.net.*;
+
 public class CovidTracker extends JPanel{
 
 	private static final long serialVersionUID = 1L;
@@ -29,6 +32,16 @@ public class CovidTracker extends JPanel{
 	long start = System.currentTimeMillis();
 	long end; 
 	Color RED_COLOR = new Color(153,0,0);
+
+
+	//TCP
+	private ServerSocket serverS;
+	private Socket clientS;
+
+	private int serverPort = 8080;
+	private String localhost = "127.0.0.1";
+	private DataOutputStream out;
+
 
 	boolean printInfected;
 	 
@@ -57,6 +70,20 @@ public class CovidTracker extends JPanel{
 
 		for (int i = 0; i < nodesNum; i++)
 			threadsInfectionTimes[i] = (float)infectionTime;
+
+		try {
+			clientS = new Socket(localhost, serverPort);
+			System.out.println("Connected to Server!");
+
+			out = new DataOutputStream(clientS.getOutputStream());
+		}
+		catch (UnknownHostException u) {
+			System.out.println(u);
+		}
+
+		catch (IOException i) {
+			System.out.println(i);
+		}
 
 		InitializeUI(xCoord,yCoord); //create xCoord x yCoord empty board
 		GenerateRandom(nodesNum); //generate random x and y coords for threads
@@ -345,6 +372,18 @@ public class CovidTracker extends JPanel{
 		    		grid[posY][posX].setText(Thread.currentThread().getName()); //update the content 
 		    		grid[oldPosY][oldPosX].setText("-"); 		//remove thread from prev position on GUI
 					grid[oldPosY][oldPosX].setForeground(Color.BLACK);
+
+
+					//TCP - new coords to be sent
+					try {
+					String tobeSent = Integer.toString(posY) + "," + Integer.toString(posX);
+					out.writeUTF(tobeSent);
+					}
+					
+					catch (IOException i) 
+					{
+						System.out.println(i);
+					}
 					
 					//update the currentThread array
 					currentThreadX[Integer.valueOf(Thread.currentThread().getName())] = (posX);
@@ -377,6 +416,17 @@ public class CovidTracker extends JPanel{
 					;
 			}
 			printInfected = false;
+
+			//closing the TCP connection
+			try {
+				clientS.close();
+				out.close();
+			}
+
+			catch (IOException i) {
+				System.out.println(i);
+			}
+
 		}
 	}
 }
