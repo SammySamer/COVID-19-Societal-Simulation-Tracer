@@ -35,7 +35,6 @@ public class CovidTracker extends JPanel{
 
 
 	//TCP
-	private ServerSocket serverS;
 	private Socket clientS;
 
 	private int serverPort = 8080;

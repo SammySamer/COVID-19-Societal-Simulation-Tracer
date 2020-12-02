@@ -8,7 +8,7 @@ public class CovidServer {
     private DataInputStream in;
 
     private int serverPort = 8080;
-
+    String fileName = "tracer.log";
     public CovidServer() {
         
         try {
@@ -50,5 +50,10 @@ public class CovidServer {
         catch (IOException i) {
             System.out.println(i);
         }
+    }
+
+
+    public static void main(String[] args) {
+        CovidServer CS = new CovidServer();
     }
 }
