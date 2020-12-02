@@ -22,9 +22,25 @@ public class CovidServer {
 
             String clientInput = "";
 
-            //once it gets "Close.", it'll start closing the server, otherwise keep running
+            //once it gets the string "Close.", it'll start closing the server, otherwise keep running
             while (!clientInput.equals("Close.")) {
                 
+                try { 
+                    clientInput = in.readUTF(); 
+                    
+                    //need to output to file here instead of print
+                    System.out.println(clientInput); 
+                } 
+
+                catch(IOException i) { 
+                    System.out.println(i); 
+                } 
+
+                //close all connections 
+                sSocket.close(); 
+                serverS.close(); 
+                in.close(); 
+
             }
         }
 

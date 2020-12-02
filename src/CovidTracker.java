@@ -376,7 +376,8 @@ public class CovidTracker extends JPanel{
 
 					//TCP - new coords to be sent
 					try {
-					String tobeSent = Integer.toString(posY) + "," + Integer.toString(posX);
+					int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
+					String tobeSent = Integer.toString(timestamp) + "," + Integer.toString(posY) + "," + Integer.toString(posX);
 					out.writeUTF(tobeSent);
 					}
 					
@@ -417,8 +418,12 @@ public class CovidTracker extends JPanel{
 			}
 			printInfected = false;
 
-			//closing the TCP connection
+			//closing the TCP connection and server
 			try {
+				//for the server to know when to close
+				String toClose = "Close.";
+				out.writeUTF(toClose);
+
 				clientS.close();
 				out.close();
 			}
