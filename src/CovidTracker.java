@@ -34,12 +34,17 @@ public class CovidTracker extends JPanel{
 	Color RED_COLOR = new Color(153,0,0);
 
 
-	//TCP
-	private Socket clientS;
-
 	private int serverPort = 8080;
-	private String localhost = "127.0.0.1";
-	private DataOutputStream out;
+	//private String localhost = "127.0.0.1";
+	private InetAddress localhostINet;
+
+	//TCP
+	//private Socket clientS;
+	//private DataOutputStream out;
+
+	//UDP
+	DatagramSocket clientUDP;
+	byte buffer[] = null;
 
 
 	boolean printInfected;
@@ -71,13 +76,7 @@ public class CovidTracker extends JPanel{
 			threadsInfectionTimes[i] = (float)infectionTime;
 
 		try {
-			clientS = new Socket(localhost, serverPort);
-			System.out.println("Connected to Server!");
-
-			out = new DataOutputStream(clientS.getOutputStream());
-		}
-		catch (UnknownHostException u) {
-			System.out.println(u);
+			localhostINet = InetAddress.getLocalHost();
 		}
 
 		catch (IOException i) {
@@ -267,7 +266,8 @@ public class CovidTracker extends JPanel{
 	        { 
 	            // Throwing an exception 
 	            System.out.println ("Interrupted exception"); 
-	        } 
+			} 
+
 	        catch (Exception e) 
 	        { 
 	            // Throwing an exception 
@@ -373,20 +373,27 @@ public class CovidTracker extends JPanel{
 					grid[oldPosY][oldPosX].setForeground(Color.BLACK);
 
 
-					//TCP - new coords to be sent
+					//Networking - new coords to be sent
 					//what's being sent: "timestamp, x, y, COVID_status"
 					try {
+						buffer = null;
 						String COVIDStatus = "";
+
 						if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 0)	
 							COVIDStatus = "False";
 						else if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 1)	
 							COVIDStatus = "True";	
 						else
 							COVIDStatus = "Infected";
+
 						int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
 						String tobeSent = Integer.toString(timestamp) + ", " + Integer.toString(posY) + ", " + Integer.toString(posX)
 						+ ", " + COVIDStatus;
-						out.writeUTF(tobeSent);
+
+						buffer = tobeSent.getBytes();
+						DatagramPacket toSend = new DatagramPacket(buffer, buffer.length, localhostINet, serverPort);
+						clientUDP.send(toSend);
+
 					}
 					
 					catch (IOException i) 
@@ -426,14 +433,23 @@ public class CovidTracker extends JPanel{
 			}
 			printInfected = false;
 
-			//closing the TCP connection and server
+			//closing the connection and server
 			try {
 				//for the server to know when to close
 				String toClose = "Close.";
-				out.writeUTF(toClose);
+
+				buffer = null;
+				buffer = toClose.getBytes();
+
+				DatagramPacket toSend = new DatagramPacket(buffer, buffer.length, localhostINet, serverPort);
+				clientUDP.send(toSend);
+
+
+				/*out.writeUTF(toClose);
 
 				clientS.close();
 				out.close();
+				*/
 			}
 
 			catch (IOException i) {
