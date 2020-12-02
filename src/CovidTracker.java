@@ -375,10 +375,19 @@ public class CovidTracker extends JPanel{
 
 
 					//TCP - new coords to be sent
+					//what's being sent: "timestamp,x,y,COVID_status"
 					try {
-					int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
-					String tobeSent = Integer.toString(timestamp) + "," + Integer.toString(posY) + "," + Integer.toString(posX);
-					out.writeUTF(tobeSent);
+						String COVIDStatus = "";
+						if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 0)	
+							COVIDStatus = "False";
+						else if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 1)	
+							COVIDStatus = "True";	
+						else
+							COVIDStatus = "Infected";
+						int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
+						String tobeSent = Integer.toString(timestamp) + "," + Integer.toString(posY) + "," + Integer.toString(posX)
+						+ "," + COVIDStatus;
+						out.writeUTF(tobeSent);
 					}
 					
 					catch (IOException i) 
