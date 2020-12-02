@@ -13,7 +13,7 @@ public class CovidServer {
 
     private int serverPort = 8080;
     String fileName = "tracer.log";
-    String str = "";
+    String str = "'\n'";
 
     boolean outputClosed = false;
     
@@ -71,6 +71,8 @@ public class CovidServer {
                     InetAddress clientAddr = serverRec.getAddress();    // ID of User
                     String clientInput = ""; // timestamp, x, y, status
                     clientInput = data(recBuffer).toString();
+                    str = null;
+                    str = "'\n'";
                     str = clientAddr.toString();
 
                     // need to output to file here instead of print

@@ -397,7 +397,7 @@ public class CovidTracker extends JPanel{
 
 						int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
 						String tobeSent = Integer.toString(timestamp) + ", " + Integer.toString(posY) + ", " + Integer.toString(posX)
-						+ ", " + COVIDStatus + "\n";
+						+ ", " + COVIDStatus;
 
 						buffer = tobeSent.getBytes();
 						DatagramPacket toSend = new DatagramPacket(buffer, buffer.length, localhostINet, serverPort);
