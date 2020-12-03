@@ -383,20 +383,21 @@ public class CovidTracker extends JPanel{
 
 
 					//Networking - new coords to be sent
-					//what's being sent: "timestamp, x, y, COVID_status"
+					//what's being sent: "ID, timestamp, x, y, COVID_status"
 					try {
 						buffer = null;
 						String COVIDStatus = null;
+						String tobeSent = null;
 
 						if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 0)	
-							COVIDStatus = "False";
+							COVIDStatus = "No_COVID";
 						else if (covidStatus[Integer.valueOf(Thread.currentThread().getName())] == 1)	
-							COVIDStatus = "True";	
+							COVIDStatus = "COVID";	
 						else
-							COVIDStatus = "Infected";
+							COVIDStatus = "True/Infected";
 
 						int timestamp = (int) ( (System.currentTimeMillis() - start) / (long)(1000.0) );
-						String tobeSent = Integer.toString(timestamp) + ", " + Integer.toString(posY) + ", " + Integer.toString(posX)
+						tobeSent = Thread.currentThread().getName() + ", " + Integer.toString(timestamp) + ", " + Integer.toString(posY) + ", " + Integer.toString(posX)
 						+ ", " + COVIDStatus;
 
 						buffer = tobeSent.getBytes();
@@ -430,6 +431,23 @@ public class CovidTracker extends JPanel{
 	}
 
   	public synchronized void PrintInfected() {
+		  
+		//closing the connection and server
+		try {
+			//for the server to know when to close
+			String toClose = "Close.";
+
+			buffer = null;
+			buffer = toClose.getBytes();
+
+			DatagramPacket toSend = new DatagramPacket(buffer, buffer.length, localhostINet, serverPort);
+			clientUDP.send(toSend);
+		}
+
+		catch (IOException i) {
+			System.out.println(i);
+		}
+
 		//Print Infected
 		if (printInfected) {
 			System.out.println ("The infected nodes are: ");
@@ -441,30 +459,6 @@ public class CovidTracker extends JPanel{
 					;
 			}
 			printInfected = false;
-
-			//closing the connection and server
-			try {
-				//for the server to know when to close
-				String toClose = "Close.";
-
-				buffer = null;
-				buffer = toClose.getBytes();
-
-				DatagramPacket toSend = new DatagramPacket(buffer, buffer.length, localhostINet, serverPort);
-				clientUDP.send(toSend);
-
-
-				/*out.writeUTF(toClose);
-
-				clientS.close();
-				out.close();
-				*/
-			}
-
-			catch (IOException i) {
-				System.out.println(i);
-			}
-
 		}
 	}
 }

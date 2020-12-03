@@ -154,7 +154,7 @@ class Slider extends JFrame
       
       //---------ADD WALK LENGTH SLIDER-----------
       
-      JSlider walkLengthSlider = new JSlider(60,100,60);
+      JSlider walkLengthSlider = new JSlider(10,100,60);
       walkLengthSlider.setPaintTicks(true);
       walkLengthSlider.setPaintLabels(true);
       walkLengthSlider.setSnapToTicks(true);
